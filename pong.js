@@ -14,6 +14,22 @@ class Rect
 		this.pos = new Vec;
 		this.size = new Vec(w, h);
 	}
+	get left()
+	{
+		return this.pos.x - this.size.x / 2;
+	}
+	get right()
+	{
+		return this.pos.x + this.size.x / 2;
+	}
+	get top()
+	{
+		return this.pos.y - this.size.y / 2;
+	}
+	get bottom()
+	{
+		return this.pos.y + this.size.y / 2;
+	}
 }
 
 class Ball extends Rect 
@@ -25,45 +41,81 @@ class Ball extends Rect
 	}
 }
 
+class Player extends Rect
+{
+	constructor()
+	{
+		super(20,100);
+		this.score = 0;
+	}
+}
+
+class Pong 
+{
+	constructor(canvas)
+	{
+		this._canvas = canvas;
+		this._context = canvas.getContext('2d');
+
+		  this.ball = new Ball;
+ 			this.ball.pos.x = 100;
+ 			this.ball.pos.y = 50;
+			
+ 			this.ball.vel.x = 100;
+ 			this.ball.vel.y = 100;
+
+ 			this.players = [
+ 				new Player,
+ 				new Player
+ 			];
+
+ 			this.players[0].pos.x = 40;
+ 			this.players[1].pos.x = this._canvas.width - 40;
+ 			this.players.forEach(player => {
+ 				player.pos.y = this._canvas.height / 2;
+ 			});
+
+		 	let lastTime;
+		 	const callback = (millis) => {
+		 	if (lastTime) {
+		 		this.update((millis - lastTime) / 1000);
+		 	}
+		 	lastTime = millis;
+		 	requestAnimationFrame(callback);
+		 };
+		 callback();
+	}
+	draw()
+	{
+	 	this._context.fillStyle = '#000';
+	 	this._context.fillRect(0, 0, 
+	 							this._canvas.width, this._canvas.height)
+		this.drawRect(this.ball);
+		this.players.forEach(player => this.drawRect(player));
+	}
+	drawRect(rect)
+	{
+
+	 	this._context.fillStyle = '#fff';
+ 		this._context.fillRect(rect.left, rect.top, 
+ 								rect.size.x, rect.size.y)
+	}
+	update(dt){
+	 	this.ball.pos.x += this.ball.vel.x * dt;
+	 	this.ball.pos.y += this.ball.vel.y * dt;
+
+	 	if (this.ball.left < 0 || this.ball.right > this._canvas.width){
+	 		this.ball.vel.x = -this.ball.vel.x;
+	 	}
+	 	if (this.ball.top < 0 || this.ball.bottom > this._canvas.height){
+	 		this.ball.vel.y = -this.ball.vel.y;
+	 	}
+	 	this.draw();
+	 }
+}
+
  const canvas = document.getElementById('pong');
- const context = canvas.getContext('2d');
-
- const ball = new Ball;
- console.log(ball);
- ball.pos.x = 100;
- ball.pos.y = 50;
-
- ball.vel.x = 100;
- ball.vel.y = 100;
-
- let lastTime;
- function callback(millis){
- 	if (lastTime) {
- 		update((millis - lastTime) / 1000);
- 	}
- 	lastTime = millis;
- 	requestAnimationFrame(callback);
- }
-
- function update(dt){
- 	ball.pos.x += ball.vel.x * dt;
- 	ball.pos.y += ball.vel.y * dt;
-
- 	if (ball.pos.x < 0 || ball.pos.x > canvas.width){
- 		ball.vel.x = -ball.vel.x;
- 	}
- 	if (ball.pos.y < 0 || ball.pos.y > canvas.height){
- 		ball.vel.y = -ball.vel.y;
- 	}
-
- 	context.fillStyle = '#000';
- 	context.fillRect(0, 0, canvas.width, canvas.height)
-	
- 	context.fillStyle = '#fff';
- 	context.fillRect(ball.pos.x, ball.pos.y, ball.size.x, ball.size.y)
-
- }
-
- callback();
+ const pong = new Pong(canvas);
+ 
 
  
