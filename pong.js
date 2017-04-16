@@ -5,6 +5,16 @@ class Vec
 		this.x = x;
 		this.y = y;
 	}
+	get len()
+	{
+		return Math.sqrt(this.x * this.x + this.y * this.y);
+	}
+	set len(value)
+	{
+		const fact = value / this.len;
+		this.x *= fact;
+		this.y *= fact;
+	}
 } 
 
 class Rect 
@@ -86,7 +96,10 @@ class Pong
 	{
 		if(player.left < ball.right && player.right > ball.left &&
 			player.top < ball.bottom && player.bottom > ball.top) {
+			const len = ball.vel.len;
 			ball.vel.x = -ball.vel.x;
+			ball.vel.y += 300 * (Math.random() - .5);
+			ball.vel.len = len * 1.05;
 		}
 	}
 	draw()
@@ -114,8 +127,9 @@ class Pong
 	start() 
 	{
 		if(this.ball.vel.x === 0 && this.ball.vel.y === 0) {
-			this.ball.vel.x = 300;
- 			this.ball.vel.y = 300;
+			this.ball.vel.x = 300 * (Math.random() > .5 ? 1 : -1);
+ 			this.ball.vel.y = 300 * (Math.random() * 2 -1);
+ 			this.ball.vel.len = 200;
 		}
 	}
 	update(dt){
@@ -146,6 +160,7 @@ class Pong
 
  canvas.addEventListener('click', event => {
  	pong.start();
+
  });
  
 
